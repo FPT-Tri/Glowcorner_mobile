@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_activity_nav"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.prm392.assignment.productsale.view.fragment.main.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_productPageFragment"
+            app:destination="@id/productPageFragment"
+            app:popExitAnim="@anim/lay_off" />
+        <action
+            android:id="@+id/action_homeFragment_to_checkoutPageFragment"
+            app:destination="@id/checkoutPageFragment"
+            app:popExitAnim="@anim/lay_off" />
+    </fragment>
+    <fragment
+        android:id="@+id/underConstructionFragment2"
+        android:name="com.prm392.assignment.productsale.view.fragment.main.UnderConstructionFragment"
+        android:label="fragment_under_construction"
+        tools:layout="@layout/fragment_under_construction" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.prm392.assignment.productsale.view.fragment.main.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/productPageFragment"
+        android:name="com.prm392.assignment.productsale.view.fragment.main.ProductPageFragment"
+        android:label="fragment_product_page"
+        tools:layout="@layout/fragment_product_page" >
+        <action
+            android:id="@+id/action_productPageFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right"/>
+    </fragment>
+    <fragment
+        android:id="@+id/checkoutPageFragment"
+        android:name="com.prm392.assignment.productsale.view.fragment.main.CheckoutPageFragment"
+        android:label="fragment_checkout_page"
+        tools:layout="@layout/fragment_checkout_page" >
+        <action
+            android:id="@+id/action_checkoutPageFragment_to_searchFragment"
+            app:destination="@id/homeFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right"/>
+        <action
+            android:id="@+id/action_checkoutPageFragment_to_paymentResultFragment"
+            app:destination="@id/paymentResultFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/paymentResultFragment"
+        android:name="com.prm392.assignment.productsale.view.fragment.main.PaymentResultFragment"
+        tools:layout="@layout/fragment_checkout_page" >
+        <action
+            android:id="@+id/action_paymentResultFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:enterAnim="@anim/slide_from_right"
+            app:exitAnim="@anim/slide_to_left"
+            app:popEnterAnim="@anim/slide_from_left"
+            app:popExitAnim="@anim/slide_to_right"/>
+    </fragment>
+</navigation>

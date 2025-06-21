@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "74692579690",
+    "firebase_url": "https://mobile-45905-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "mobile-45905",
+    "storage_bucket": "mobile-45905.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:74692579690:android:057a0623c830fe77821513",
+        "android_client_info": {
+          "package_name": "com.prm392.assignment.productsale"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy3x91ipZhQ3hajarI1epSuxWMo4yQ-_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
