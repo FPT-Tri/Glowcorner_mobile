@@ -1,36 +1,51 @@
 package com.example.mobile.Adapter;
 
+import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.mobile.Models.Product;
+import com.example.mobile.Api.ApiClient;
+import com.example.mobile.Api.ApiService;
+import com.example.mobile.Models.AddToCartRequest;
 import com.example.mobile.R;
+import com.example.mobile.SignInActivity;
 
+import java.io.IOException;
 import java.util.List;
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
-    private List<Product> productList;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    public ProductAdapter(List<Product> productList) {
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
+    private static final String TAG = "ProductAdapter";
+    private List<com.example.mobile.Models.Product> productList;
+    private Context context;
+
+    public ProductAdapter(List<com.example.mobile.Models.Product> productList) {
         this.productList = productList;
     }
 
     @Override
     public ProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_product, parent, false);
+        context = parent.getContext();
         return new ProductViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ProductViewHolder holder, int position) {
-        Product product = productList.get(position);
+        com.example.mobile.Models.Product product = productList.get(position);
         holder.productIdTextView.setText(product.getProductID());
         holder.productNameTextView.setText(product.getProductName());
         holder.categoryTextView.setText(product.getCategory());
@@ -46,9 +61,68 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Example action: Log the product ID
-                String productId = product.getProductID();
-                // TODO: Implement your action (e.g., add to cart)
+                String userID = SignInActivity.getStoredValue(context, "userID");
+                String productID = product.getProductID();
+                int quantity = 1;
+
+                if (userID == null) {
+                    Toast.makeText(context, "User not logged in", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                AddToCartRequest request = new AddToCartRequest(quantity);
+                ApiService apiService = ApiClient.getClient().create(ApiService.class);
+                Call<ResponseBody> call = apiService.addToCart(userID, productID, request); // Changed to ResponseBody
+
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            try {
+                                String responseString = response.body().string();
+                                Log.d(TAG, "Response String: " + responseString);
+                                if ("success".equalsIgnoreCase(responseString) || responseString.contains("\"success\":true")) {
+                                    Toast.makeText(context, "Added to cart successfully!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(context, "Failed to add to cart: " + responseString, Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (IOException e) {
+                                Log.e(TAG, "Error reading response: " + e.getMessage());
+                                Toast.makeText(context, "Error adding to cart", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            // Log raw response body if available
+                            ResponseBody errorBody = response.errorBody();
+                            if (errorBody != null) {
+                                try {
+                                    String rawResponse = errorBody.string();
+                                    Log.e(TAG, "Raw Response: " + rawResponse);
+                                    Toast.makeText(context, "API Error: " + rawResponse, Toast.LENGTH_SHORT).show();
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Error reading response body: " + e.getMessage());
+                                }
+                            }
+                            Toast.makeText(context, "Error adding to cart", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.e(TAG, "API Call Failed: " + t.getMessage(), t);
+                        if (t instanceof retrofit2.HttpException) {
+                            retrofit2.HttpException httpException = (retrofit2.HttpException) t;
+                            try {
+                                String errorBody = httpException.response().errorBody().string();
+                                Log.e(TAG, "Error Body: " + errorBody);
+                                Toast.makeText(context, "API Error: " + errorBody, Toast.LENGTH_SHORT).show();
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error reading error body: " + e.getMessage());
+                            }
+                        } else {
+                            Toast.makeText(context, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
     }

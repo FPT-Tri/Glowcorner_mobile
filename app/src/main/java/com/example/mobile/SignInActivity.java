@@ -1,6 +1,8 @@
 package com.example.mobile;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +34,9 @@ public class SignInActivity extends AppCompatActivity {
     private static final String STATIC_USERNAME = "user";
     private static final String STATIC_PASSWORD = "pass";
 
+    // SharedPreferences key
+    private static final String PREF_NAME = "UserPrefs";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +59,6 @@ public class SignInActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Comment out API call and use static check
-                /*
                 LoginRequest loginRequest = new LoginRequest(username, password);
                 ApiService apiService = ApiClient.getClient().create(ApiService.class);
                 Call<ApiResponse> call = apiService.login(loginRequest);
@@ -71,15 +74,33 @@ public class SignInActivity extends AppCompatActivity {
                         Log.d(TAG, "Response Code: " + response.code() + ", Body: " + (response.body() != null ? response.body().toString() : "null"));
                         if (response.isSuccessful() && response.body() != null) {
                             ApiResponse apiResponse = response.body();
-                            if ("success".equals(apiResponse.getStatus())) {
+                            if (apiResponse.isSuccess()) { // Use isSuccess() instead of getStatus()
                                 Log.d(TAG, "Login Successful, Navigating to HomeActivity");
+
+                                // Save user details to SharedPreferences
+                                SharedPreferences prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putInt("status", apiResponse.getStatus());
+                                editor.putString("description", apiResponse.getDescription());
+                                ApiResponse.Data data = apiResponse.getData();
+                                if (data != null) {
+                                    editor.putString("jwtToken", data.getJwtToken());
+                                    editor.putString("userID", data.getUserID());
+                                    editor.putString("userRole", data.getRole()); // Use data.role
+                                    editor.putString("userEmail", data.getEmail()); // Map to email
+                                    editor.putString("fullName", data.getFullName());
+                                    editor.putString("userAddress", ""); // Not in response, default to empty
+                                    editor.putString("userPhone", "");   // Not in response, default to empty
+                                }
+                                editor.apply();
+
                                 Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
                                 startActivity(intent);
                                 finish();
                             } else {
-                                Log.w(TAG, "Login Failed: " + apiResponse.getMessage());
-                                Toast.makeText(SignInActivity.this, apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                                Log.w(TAG, "Login Failed: " + apiResponse.getDescription());
+                                Toast.makeText(SignInActivity.this, apiResponse.getDescription(), Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Log.e(TAG, "Unsuccessful response: " + response.message());
@@ -92,21 +113,34 @@ public class SignInActivity extends AppCompatActivity {
                         long endTime = new Date().getTime();
                         Log.e(TAG, "API Call Failed at: " + endTime + ", Duration: " + (endTime - startTime) + " ms, Error: " + t.getMessage(), t);
                         Toast.makeText(SignInActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        // Fallback to static check if API fails
+                        if (username.equals(STATIC_USERNAME) && password.equals(STATIC_PASSWORD)) {
+                            Log.d(TAG, "Login Successful with static credentials, Navigating to HomeActivity");
+                            // Save static login details to SharedPreferences
+                            SharedPreferences prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putInt("status", 200);
+                            editor.putString("description", "Login successful! (Static fallback)");
+                            editor.putString("jwtToken", "dummy-jwt");
+                            editor.putString("userID", "dummy-id");
+                            editor.putString("userRole", "CUSTOMER");
+                            editor.putString("userEmail", "user@example.com");
+                            editor.putString("fullName", "Dummy User");
+                            editor.putString("userAddress", "Dummy Address");
+                            editor.putString("userPhone", "1234567890");
+                            editor.apply();
+
+                            Toast.makeText(SignInActivity.this, "Login successful! (Static fallback)", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Log.w(TAG, "Login Failed: Invalid username or password (Static check)");
+                            Toast.makeText(SignInActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
-                */
-
-                // Static login check
-                if (username.equals(STATIC_USERNAME) && password.equals(STATIC_PASSWORD)) {
-                    Log.d(TAG, "Login Successful with static credentials, Navigating to HomeActivity");
-                    Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Log.w(TAG, "Login Failed: Invalid username or password");
-                    Toast.makeText(SignInActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
-                }
             }
         });
 
@@ -148,5 +182,17 @@ public class SignInActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy called");
+    }
+
+    // Helper method to get stored value (can be used in other activities)
+    public static String getStoredValue(Context context, String key) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(key, null);
+    }
+
+    // Helper method to get stored int value
+    public static int getStoredIntValue(Context context, String key) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getInt(key, -1);
     }
 }

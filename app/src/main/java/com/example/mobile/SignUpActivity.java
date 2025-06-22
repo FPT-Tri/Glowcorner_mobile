@@ -56,13 +56,13 @@ public class SignUpActivity extends AppCompatActivity {
                     public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             ApiResponse apiResponse = response.body();
-                            if ("success".equals(apiResponse.getStatus())) {
+                            if (apiResponse.isSuccess()) { // Check success boolean
                                 Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
                                 startActivity(intent);
                                 finish();
                             } else {
-                                Toast.makeText(SignUpActivity.this, apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignUpActivity.this, apiResponse.getDescription(), Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Toast.makeText(SignUpActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();

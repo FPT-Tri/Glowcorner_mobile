@@ -1,8 +1,8 @@
 package com.example.mobile;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,7 +14,6 @@ import com.example.mobile.Api.ApiClient;
 import com.example.mobile.Api.ApiService;
 import com.example.mobile.Models.Product;
 import com.example.mobile.Models.ProductResponse;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.List;
 
@@ -37,23 +36,17 @@ public class HomeActivity extends AppCompatActivity {
         adapter = new ProductAdapter(null);
         recyclerView.setAdapter(adapter);
 
-        // Set up BottomNavigationView
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_sign_in) {
-                Log.d(TAG, "Navigating to SignInActivity");
-                Intent intent = new Intent(HomeActivity.this, SignInActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (itemId == R.id.nav_cart) {
-                Log.d(TAG, "Navigating to CartActivity");
-                Intent intent = new Intent(HomeActivity.this, CartActivity.class);
-                startActivity(intent);
-                return true;
-            }
-            return false;
-        });
+        // Setup navigation using NavigationManager
+        NavigationManager.setupNavigation(this, findViewById(R.id.bottom_navigation));
+
+        // Display userID from SharedPreferences
+        TextView userIdTextView = findViewById(R.id.userIdTextView);
+        String userID = SignInActivity.getStoredValue(this, "userID");
+        if (userID != null) {
+            userIdTextView.setText("User ID: " + userID);
+        } else {
+            userIdTextView.setText("User ID: Not logged in");
+        }
 
         loadProducts();
     }

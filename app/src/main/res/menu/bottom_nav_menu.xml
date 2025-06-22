@@ -8,4 +8,8 @@
         android:id="@+id/nav_cart"
         android:title="Cart"
         android:icon="@android:drawable/ic_menu_gallery" />
+    <item
+        android:id="@+id/nav_logout"
+        android:title="Log Out"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel" />
 </menu>
