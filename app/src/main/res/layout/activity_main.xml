@@ -116,7 +116,7 @@
             android:lines="1"
             android:maxLines="1"
             android:singleLine="true"
-            android:text="@string/user_name"
+            android:text="@string/email"
             android:textAlignment="center"
             android:textColor="#FFF"
             android:textSize="26sp"

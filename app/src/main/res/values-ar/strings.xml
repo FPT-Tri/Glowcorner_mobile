@@ -42,7 +42,7 @@
     <string name = "help"> تعليمات </string>
     <string name = "about"> حول </string>
     <string name = "sign_out"> الخروج </string>
-    <string name = "user_name"> اسم المستخدم </string>
+    <string name = "email"> اسم المستخدم </string>
     <string name = "account_type"> نوع الحساب </string>
     <string name = "scanning"> المسح </string>
     <string name = "product_barcode"> الرمز الشريطي للمنتج </string>

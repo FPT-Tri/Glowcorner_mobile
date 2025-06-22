@@ -159,9 +159,9 @@ public class SignUpFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (!editable.toString().isEmpty()) {
-                    if (TextFieldValidator.isValidPassword(editable.toString()))
-                        vb.signUpPassword.setError(null);
-                    else vb.signUpPassword.setError(getString(R.string.Password_not_valid));
+//                    if (TextFieldValidator.isValidPassword(editable.toString()))
+//                        vb.signUpPassword.setError(null);
+//                    else vb.signUpPassword.setError(getString(R.string.Password_not_valid));
                 } else vb.signUpPassword.setError(null);
 
                 if (vb.signUpPasswordConfirm.getEditText().getText().length() > 0) {

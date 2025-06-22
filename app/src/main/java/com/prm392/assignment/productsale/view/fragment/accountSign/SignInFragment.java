@@ -89,9 +89,9 @@ public class SignInFragment extends Fragment {
             validData = false;
         }
 
-        if (vb.signInUsername.getError() != null || vb.signInUsername.getEditText().getText().length() == 0) {
-            vb.signInUsername.requestFocus();
-            vb.signInUsername.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fieldmissing));
+        if (vb.signInEmail.getError() != null || vb.signInEmail.getEditText().getText().length() == 0) {
+            vb.signInEmail.requestFocus();
+            vb.signInEmail.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fieldmissing));
             validData = false;
         }
 
@@ -101,7 +101,7 @@ public class SignInFragment extends Fragment {
     void signIn() {
         DialogsProvider.get(getActivity()).setLoading(true);
 
-        viewModel.signIn(vb.signInUsername.getEditText().getText().toString(), vb.signInPassword.getEditText().getText().toString())
+        viewModel.signIn(vb.signInEmail.getEditText().getText().toString(), vb.signInPassword.getEditText().getText().toString())
                 .observe(getViewLifecycleOwner(), response -> {
 
                     DialogsProvider.get(getActivity()).setLoading(false);

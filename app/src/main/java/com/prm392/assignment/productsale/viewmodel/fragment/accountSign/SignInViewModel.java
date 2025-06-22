@@ -17,9 +17,9 @@ public class SignInViewModel extends ViewModel {
         authRepository = new AuthRepository();
     }
 
-    public LiveData<Response<UserResponseModel>> signIn(String username, String password) {
+    public LiveData<Response<UserResponseModel>> signIn(String email, String password) {
         SignInModel signInModel = new SignInModel();
-        signInModel.setUsername(username);
+        signInModel.setEmail(email);
         signInModel.setPassword(password);
 
         return authRepository.signIn(signInModel);

@@ -32,7 +32,7 @@
             android:background="@drawable/input"
             android:fadingEdge="horizontal"
             android:fadingEdgeLength="10dp"
-            android:hint="@string/user_name"
+            android:hint="@string/email"
             android:inputType="textPersonName"
             android:maxLength="32"
             android:paddingLeft="15dp"

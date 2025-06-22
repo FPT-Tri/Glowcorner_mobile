@@ -17,10 +17,10 @@ public final class TextFieldValidator {
     //Patterns
     private static final Pattern nameRegex = Pattern.compile("((\\w|\\s|\\.|-)+){2,}");
     private static final Pattern userNameRegex = Pattern.compile("(([A-Z]|[a-z]|[0-9]|\\.|_)+){5,50}");
-    private static final Pattern emailRegex = Pattern.compile("(\\.*\\w+)+@([a-z]+|[A-Z]+)(\\.com|\\.sa)(\\.([a-z]+|[A-Z]+)+)?");
+    private static final Pattern emailRegex = Pattern.compile("(\\.*\\w+)+@([a-z]+|[A-Z]+)(\\.com|\\.sa|\\.vn)(\\.([a-z]+|[A-Z]+)+)?");
     private static final Pattern phoneRegex = Pattern.compile("(\\+84|0)(3[2-9]|5[6-9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7,8}(\\s|\\.|\\-)*");
     private static final Pattern addressRegex = Pattern.compile("[\\p{L}\\d\\s\\-\\.\\,/#]{10,100}");
-    private static final Pattern passwordRegex = Pattern.compile("(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}");
+//    private static final Pattern passwordRegex = Pattern.compile("(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}");
     private static final Pattern storeWebsiteRegex = Pattern.compile("(http:\\/\\/|https:\\/\\/)(www\\.|store\\.|shop\\.|marketplace\\.)?([A-Z]|[a-z]|[0-9]|-){2,}(\\.([A-Z]|[a-z]){2,7})(\\.\\w{2,3})?\\/?");
 
     public static boolean isValidUserName(String userName) {
@@ -39,9 +39,9 @@ public final class TextFieldValidator {
         return addressRegex.matcher(address).matches();
     }
 
-    public static boolean isValidPassword(String password) {
-        return passwordRegex.matcher(password).matches();
-    }
+//    public static boolean isValidPassword(String password) {
+//        return passwordRegex.matcher(password).matches();
+//    }
 
     public static boolean isValidStoreName(String storeName) {
         return nameRegex.matcher(storeName).matches();
