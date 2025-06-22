@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Allow cleartext traffic if necessary -->
-    <base-config cleartextTrafficPermitted="true" />
-
-    <!-- Or trust a specific self-signed certificate for your domain -->
-    <domain-config>
-        <!-- Nếu bạn đang dùng emulator, thay "10.0.2.2" bằng hostname của API -->
+    <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.0.2.2</domain>
-        <trust-anchors>
-            <certificates src="user" />
-            <certificates src="system" />
-        </trust-anchors>
     </domain-config>
 </network-security-config>

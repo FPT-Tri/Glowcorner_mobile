@@ -1,0 +1,152 @@
+package com.example.mobile;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.mobile.Api.ApiClient;
+import com.example.mobile.Api.ApiResponse;
+import com.example.mobile.Api.ApiService;
+import com.example.mobile.Models.LoginRequest;
+
+import java.util.Date;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class SignInActivity extends AppCompatActivity {
+    private static final String TAG = "SignInActivity";
+    private EditText usernameEditText, passwordEditText;
+    private Button loginButton;
+    private TextView signUpTextView;
+
+    // Static credentials for login
+    private static final String STATIC_USERNAME = "user";
+    private static final String STATIC_PASSWORD = "pass";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate called");
+        setContentView(R.layout.sign_in);
+
+        usernameEditText = findViewById(R.id.usernameEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+        loginButton = findViewById(R.id.loginButton);
+        signUpTextView = findViewById(R.id.signUpTextView);
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String username = usernameEditText.getText().toString().trim();
+                String password = passwordEditText.getText().toString().trim();
+
+                if (username.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(SignInActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Comment out API call and use static check
+                /*
+                LoginRequest loginRequest = new LoginRequest(username, password);
+                ApiService apiService = ApiClient.getClient().create(ApiService.class);
+                Call<ApiResponse> call = apiService.login(loginRequest);
+
+                long startTime = new Date().getTime();
+                Log.d(TAG, "API Call Started at: " + startTime + " for username: " + username);
+
+                call.enqueue(new Callback<ApiResponse>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                        long endTime = new Date().getTime();
+                        Log.d(TAG, "API Call Ended at: " + endTime + ", Duration: " + (endTime - startTime) + " ms");
+                        Log.d(TAG, "Response Code: " + response.code() + ", Body: " + (response.body() != null ? response.body().toString() : "null"));
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse apiResponse = response.body();
+                            if ("success".equals(apiResponse.getStatus())) {
+                                Log.d(TAG, "Login Successful, Navigating to HomeActivity");
+                                Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Log.w(TAG, "Login Failed: " + apiResponse.getMessage());
+                                Toast.makeText(SignInActivity.this, apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Log.e(TAG, "Unsuccessful response: " + response.message());
+                            Toast.makeText(SignInActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse> call, Throwable t) {
+                        long endTime = new Date().getTime();
+                        Log.e(TAG, "API Call Failed at: " + endTime + ", Duration: " + (endTime - startTime) + " ms, Error: " + t.getMessage(), t);
+                        Toast.makeText(SignInActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                */
+
+                // Static login check
+                if (username.equals(STATIC_USERNAME) && password.equals(STATIC_PASSWORD)) {
+                    Log.d(TAG, "Login Successful with static credentials, Navigating to HomeActivity");
+                    Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Log.w(TAG, "Login Failed: Invalid username or password");
+                    Toast.makeText(SignInActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        signUpTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Navigating to SignUpActivity");
+                Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart called");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume called");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause called");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop called");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy called");
+    }
+}
