@@ -18,9 +18,9 @@ public class NavigationManager {
         if (bottomNavigationView != null) {
             bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
                 int itemId = item.getItemId();
-                if (itemId == R.id.nav_sign_in) {
-                    Log.d(TAG, "Navigating to SignInActivity");
-                    Intent intent = new Intent(activity, SignInActivity.class);
+                if (itemId == R.id.nav_home) {
+                    Log.d(TAG, "Navigating to HomeActivity");
+                    Intent intent = new Intent(activity, HomeActivity.class);
                     activity.startActivity(intent);
                     return true;
                 } else if (itemId == R.id.nav_cart) {
@@ -28,18 +28,11 @@ public class NavigationManager {
                     Intent intent = new Intent(activity, CartActivity.class);
                     activity.startActivity(intent);
                     return true;
-                } else if (itemId == R.id.nav_logout) {
-                    Log.d(TAG, "Logging out and clearing SharedPreferences");
-                    // Clear all SharedPreferences data
-                    SharedPreferences prefs = activity.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.clear();
-                    editor.apply();
-                    Toast.makeText(activity, "Logged out successfully", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(activity, SignInActivity.class);
-                    activity.startActivity(intent);
-                    activity.finish();
-                    return true;
+                }else if (itemId == R.id.nav_quiz) {
+                        Log.d(TAG, "Navigating to QuizFragment");
+                        Intent intent = new Intent(activity, QuizActivity.class);
+                        activity.startActivity(intent);
+                        return true;
                 }
                 return false;
             });

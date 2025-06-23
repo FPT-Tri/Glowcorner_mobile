@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
 
+
     // Retrofit dependencies
     implementation(libs.retrofit.core) // Updated line
     implementation(libs.retrofit.converter.gson)
@@ -45,10 +46,18 @@ dependencies {
     implementation(libs.glide)
     annotationProcessor(libs.glide.compiler)
 
+    // Kotlin Coroutines
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
 
+    // Recyclerview dependencies
     implementation(libs.recyclerview)
+
+    //Stripe dependencies
+    implementation(libs.stripe)
+
+    // CardView dependencies
+    implementation(libs.cardview)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

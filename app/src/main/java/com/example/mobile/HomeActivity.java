@@ -23,32 +23,42 @@ import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivity";
+
     private RecyclerView recyclerView;
     private ProductAdapter adapter;
+    private TextView userIdTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        // Khởi tạo UI
+        initViews();
+
+        // Cài đặt navigation và dropdown
+        setupNavigation();
+
+        // Load dữ liệu sản phẩm
+        loadProducts();
+    }
+
+    private void initViews() {
         recyclerView = findViewById(R.id.recycler_view);
+        userIdTextView = findViewById(R.id.userIdTextView);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ProductAdapter(null);
         recyclerView.setAdapter(adapter);
 
-        // Setup navigation using NavigationManager
-        NavigationManager.setupNavigation(this, findViewById(R.id.bottom_navigation));
-
-        // Display userID from SharedPreferences
-        TextView userIdTextView = findViewById(R.id.userIdTextView);
+        // Hiển thị user ID từ SharedPreferences
         String userID = SignInActivity.getStoredValue(this, "userID");
-        if (userID != null) {
-            userIdTextView.setText("User ID: " + userID);
-        } else {
-            userIdTextView.setText("User ID: Not logged in");
-        }
+        userIdTextView.setText(userID != null ? "User ID: " + userID : "User ID: Not logged in");
+    }
 
-        loadProducts();
+    private void setupNavigation() {
+        NavigationManager.setupNavigation(this, findViewById(R.id.bottom_navigation));
+        new DropdownMenuManager(this);
     }
 
     private void loadProducts() {
@@ -60,20 +70,16 @@ public class HomeActivity extends AppCompatActivity {
         call.enqueue(new Callback<ProductResponse>() {
             @Override
             public void onResponse(Call<ProductResponse> call, Response<ProductResponse> response) {
-                Log.d(TAG, "Response Code: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
-                    ProductResponse productResponse = response.body();
-                    List<Product> products = productResponse.getData();
-                    Log.d(TAG, "Response Data: " + (products != null ? products.toString() : "null"));
-                    if (products != null) {
+                    List<Product> products = response.body().getData();
+                    if (products != null && !products.isEmpty()) {
                         adapter = new ProductAdapter(products);
                         recyclerView.setAdapter(adapter);
                     } else {
-                        Log.e(TAG, "No products in response");
                         Toast.makeText(HomeActivity.this, "No products available", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Log.e(TAG, "Unsuccessful response: " + response.message());
+                    Log.e(TAG, "Response unsuccessful: " + response.message());
                     Toast.makeText(HomeActivity.this, "Failed to load products", Toast.LENGTH_SHORT).show();
                 }
             }

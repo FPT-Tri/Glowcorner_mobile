@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.mobile.Api.ApiClient;
 import com.example.mobile.Api.ApiService;
-import com.example.mobile.Models.AddToCartRequest;
 import com.example.mobile.R;
 import com.example.mobile.SignInActivity;
 
@@ -70,9 +69,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                     return;
                 }
 
-                AddToCartRequest request = new AddToCartRequest(quantity);
                 ApiService apiService = ApiClient.getClient().create(ApiService.class);
-                Call<ResponseBody> call = apiService.addToCart(userID, productID, request); // Changed to ResponseBody
+                Call<ResponseBody> call = apiService.addToCart(userID, productID, quantity);
 
                 call.enqueue(new Callback<ResponseBody>() {
                     @Override

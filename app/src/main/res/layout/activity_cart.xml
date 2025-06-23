@@ -46,6 +46,24 @@
             android:textSize="16sp" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btn_enter_information"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter Information"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/teal_200"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/btn_checkout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Checkout"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/teal_200"
+        android:textColor="@android:color/white" />
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
