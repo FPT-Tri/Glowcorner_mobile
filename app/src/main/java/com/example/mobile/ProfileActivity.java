@@ -1,5 +1,6 @@
 package com.example.mobile;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -102,29 +103,29 @@ public class ProfileActivity extends AppCompatActivity {
                             JsonObject rootObj = parser.parse(responseString).getAsJsonObject();
                             JsonObject dataObject = rootObj.getAsJsonObject("data");
 
-                            // Parse fields with null checks
-                            String fullname = dataObject.has("name") && !dataObject.get("name").isJsonNull()
-                                    ? dataObject.get("name").getAsString() : "Name not available";
+                            // Parse fields with correct field names
+                            String fullname = dataObject.has("fullName") && !dataObject.get("fullName").isJsonNull()
+                                    ? dataObject.get("fullName").getAsString() : "";
                             String email = dataObject.has("email") && !dataObject.get("email").isJsonNull()
                                     ? dataObject.get("email").getAsString() : "Email not available";
                             String phone = dataObject.has("phone") && !dataObject.get("phone").isJsonNull()
                                     ? dataObject.get("phone").getAsString() : "Phone not available";
                             String address = dataObject.has("address") && !dataObject.get("address").isJsonNull()
                                     ? dataObject.get("address").getAsString() : "Address not available";
-                            String skinType = dataObject.has("skin_type") && !dataObject.get("skin_type").isJsonNull()
-                                    ? dataObject.get("skin_type").getAsString() : "Skin Type not available";
-                            String skinCareRoutine = dataObject.has("skin_care_routine") && !dataObject.get("skin_care_routine").isJsonNull()
-                                    ? dataObject.get("skin_care_routine").getAsString() : "Skin Care Routine: Not set";
+                            String skinType = dataObject.has("skinType") && !dataObject.get("skinType").isJsonNull()
+                                    ? dataObject.get("skinType").getAsString() : "Skin Type not available";
+                            String skinCareRoutine = dataObject.has("skinCareRoutine") && !dataObject.get("skinCareRoutine").isJsonNull()
+                                    ? dataObject.get("skinCareRoutine").getAsString() : "Skin Care Routine: Not set";
                             String avatarUrl = dataObject.has("avatar_url") && !dataObject.get("avatar_url").isJsonNull()
-                                    ? dataObject.get("avatar_url").getAsString() : null; // Adjust field name if different
+                                    ? dataObject.get("avatar_url").getAsString() : null; // Matches the response field
 
                             // Set text fields
-                            profileFullnameTextView.setText(fullname);
+                            profileFullnameTextView.setText(fullname.isEmpty() ? "Name not available" : fullname);
                             profileEmailTextView.setText(email);
                             profilePhoneTextView.setText(phone);
                             profileAddressTextView.setText(address);
                             profileSkinTypeTextView.setText(skinType);
-                            profileSkinCareRoutineTextView.setText(skinCareRoutine);
+                            profileSkinCareRoutineTextView.setText(skinCareRoutine.isEmpty() ? "Skin Care Routine: Not set" : skinCareRoutine);
 
                             // Load avatar image with Glide
                             if (avatarUrl != null) {
@@ -135,6 +136,16 @@ public class ProfileActivity extends AppCompatActivity {
                                         .into(profileAvatarImageView);
                             } else {
                                 profileAvatarImageView.setImageResource(R.drawable.ava); // Default if no URL
+                            }
+
+                            // Save address to SharedPreferences if not already saved
+                            String storedAddress = SignInActivity.getStoredValue(ProfileActivity.this, "userAddress");
+                            if (address != null && !address.equals("Address not available") && (storedAddress == null || storedAddress.isEmpty())) {
+                                SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString("userAddress", address);
+                                editor.apply();
+                                Log.d(TAG, "Saved new userAddress to SharedPreferences: " + address);
                             }
                         } else {
                             Toast.makeText(ProfileActivity.this, "Failed to load profile: " + jsonObject.getString("description"), Toast.LENGTH_SHORT).show();

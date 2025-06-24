@@ -22,4 +22,16 @@ public class Product {
     public String getCategory() { return category; }
     public double getRating() { return rating; }
     public String getImageUrl() { return image_url; }
+
+    public Product(String productID, String productName, String description, double price,
+                   String imageUrl, String category, double rating) {
+        this.productID = productID;
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.image_url = imageUrl;
+        this.category = category;
+        this.rating = rating;
+    }
+
 }

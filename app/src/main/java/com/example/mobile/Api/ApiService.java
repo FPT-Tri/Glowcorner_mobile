@@ -5,10 +5,12 @@ import com.example.mobile.Models.AddToCartRequest;
 import com.example.mobile.Models.AddToCartResponse;
 import com.example.mobile.Models.CartResponse;
 import com.example.mobile.Models.LoginRequest;
+import com.example.mobile.Models.OrderResponse;
 import com.example.mobile.Models.Product;
 import com.example.mobile.Models.ProductResponse;
 import com.example.mobile.Models.QuizResponse;
 import com.example.mobile.Models.RegisterRequest;
+import com.google.gson.JsonObject;
 
 import java.util.List;
 
@@ -47,7 +49,11 @@ public interface ApiService {
     // Stripe Payment old
     @POST("api/create-payment-intent")
     Call<ResponseBody> createPaymentIntent(@Query("amount") double amount, @Query("currency") String currency, @Query("secretKey") String secretKey);
+
     // Stripe Payment now
+    @POST("/api/orders/customer/{userID}/create")
+    Call<OrderResponse> createOrder(@Header("Authorization") String token, @Path("userID") String userID, @Body JsonObject orderData);
+
     @POST("/api/payment/stripe/create-intent")
     Call<ResponseBody> createStripePaymentIntent(@Header("Authorization") String token, @Query("amount") double amount, @Query("currency") String currency);
 
@@ -56,6 +62,12 @@ public interface ApiService {
     Call<ResponseBody> getCustomerOrders(@Header("Authorization") String token, @Path("userID") String userID);
 
     // Get Quizzes
-    @GET("/api/quizzes")
-    Call<QuizResponse> getQuizzes();
+    @GET("api/quizzes")
+    Call<ResponseBody> getQuizzes();
+
+    // Get Skintype by Quiz ID
+    @GET("api/skin-care-routines")
+    Call<ResponseBody> getSkinCareRoutines();
+    @GET("api/skin-care-routines/{routineId}")
+    Call<ResponseBody> getRoutineById(@Path("routineId") String routineId);
 }
