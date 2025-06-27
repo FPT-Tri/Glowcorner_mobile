@@ -1,8 +1,7 @@
 package com.example.mobile.Api;
 
-import com.google.gson.Gson;
+import com.example.mobile.Models.ProductResponse;
 import com.google.gson.GsonBuilder;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -14,9 +13,9 @@ public class ApiClient {
 
     public static Retrofit getClient() {
         if (retrofit == null) {
-            Gson gson = new GsonBuilder()
-                    .setLenient() // Enable lenient parsing to handle malformed JSON
-                    .create();
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.setLenient(); // Enable lenient parsing to handle malformed JSON
+            gsonBuilder.registerTypeAdapter(ProductResponse.class, new ProductResponse.DataDeserializer());
 
             // Add logging interceptor for debugging
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -29,7 +28,7 @@ public class ApiClient {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(okHttpClient)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
                     .build();
         }
         return retrofit;

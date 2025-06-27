@@ -18,4 +18,14 @@ public class Routine {
         this.routineDescription = routineDescription;
         this.productDTOS = productDTOS;
     }
+    public String getRoutineName() {
+        return routineName;
+    }
+
+    public String getRoutineDescription() {
+        return routineDescription;
+    }
+    public String getRoutineID() {
+        return routineID;
+    }
 }

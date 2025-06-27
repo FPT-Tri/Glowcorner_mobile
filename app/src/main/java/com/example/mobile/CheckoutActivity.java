@@ -3,73 +3,57 @@ package com.example.mobile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
+import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.stripe.android.PaymentConfiguration;
-import com.stripe.android.paymentsheet.PaymentSheet;
-import com.stripe.android.paymentsheet.PaymentSheetResult;
 
 public class CheckoutActivity extends AppCompatActivity {
     private static final String TAG = "CheckoutActivity";
-    private PaymentSheet paymentSheet;
-    private String paymentIntentClientSecret;
+    private String clientSecret;
+    private double totalAmount;
+    private double discountedAmount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkout);
 
-        // Configure Stripe with test publishable key
-        PaymentConfiguration.init(this, "pk_test_51R4HLJ4a2fYGaT9ntHjY5Bm02V5TDbxj0TCjxJQTXUTxKcaeDu8EMW374Zkr1AZKMaUHOdJWktcFpyapHpDLzeko00g99ZbkhB");
+        Button payButton = findViewById(R.id.payButton);
 
-        // Get data from Intent
+        // Retrieve data from intent
         Intent intent = getIntent();
-        paymentIntentClientSecret = intent.getStringExtra("paymentIntentClientSecret");
-        String userID = intent.getStringExtra("userID");
-        double totalAmount = intent.getDoubleExtra("totalAmount", 0.0);
-        double discountedTotalAmount = intent.getDoubleExtra("discountedTotalAmount", 0.0);
+        clientSecret = intent.getStringExtra("clientSecret");
+        totalAmount = intent.getDoubleExtra("totalAmount", 0.0);
+        discountedAmount = intent.getDoubleExtra("discountedAmount", 0.0);
 
-        if (paymentIntentClientSecret == null || paymentIntentClientSecret.isEmpty()) {
-            Toast.makeText(this, "Payment intent not initialized", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
+        Log.d(TAG, "Received clientSecret: " + clientSecret);
 
-        if (userID == null || totalAmount <= 0) {
-            Toast.makeText(this, "Invalid user or amount data", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
-        // Present payment sheet
-        presentPaymentSheet();
+        // Navigate to SuccessActivity immediately on pay button click
+        payButton.setOnClickListener(v -> {
+            Log.d(TAG, "Pay button clicked, navigating to SuccessActivity");
+            Intent successIntent = new Intent(CheckoutActivity.this, SuccessActivity.class);
+            successIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(successIntent);
+            finish(); // Close CheckoutActivity
+        });
     }
 
-    private void presentPaymentSheet() {
-        paymentSheet = new PaymentSheet(this, paymentSheetResult -> {
-            if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
-                Toast.makeText(CheckoutActivity.this, "Payment successful!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(CheckoutActivity.this, SuccessActivity.class);
-                startActivity(intent);
-                finish();
-            } else if (paymentSheetResult instanceof PaymentSheetResult.Failed) {
-                Toast.makeText(CheckoutActivity.this, "Payment failed: " + ((PaymentSheetResult.Failed) paymentSheetResult).getError().getMessage(), Toast.LENGTH_SHORT).show();
-                finish();
-            } else if (paymentSheetResult instanceof PaymentSheetResult.Canceled) {
-                Toast.makeText(CheckoutActivity.this, "Payment canceled", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("clientSecret", clientSecret);
+        outState.putDouble("totalAmount", totalAmount);
+        outState.putDouble("discountedAmount", discountedAmount);
+        Log.d(TAG, "Saving instance state");
+    }
 
-        try {
-            paymentSheet.presentWithPaymentIntent(paymentIntentClientSecret, new PaymentSheet.Configuration.Builder("Your Store")
-                    .build());
-        } catch (Exception e) {
-            Log.e(TAG, "Error presenting PaymentSheet: " + e.getMessage());
-            Toast.makeText(this, "Error during checkout: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            finish();
-        }
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        clientSecret = savedInstanceState.getString("clientSecret");
+        totalAmount = savedInstanceState.getDouble("totalAmount");
+        discountedAmount = savedInstanceState.getDouble("discountedAmount");
+        Log.d(TAG, "Restoring instance state");
     }
 }

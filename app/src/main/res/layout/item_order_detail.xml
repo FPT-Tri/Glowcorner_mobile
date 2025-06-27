@@ -6,33 +6,26 @@
     android:padding="8dp">
 
     <TextView
-        android:id="@+id/order_id"
+        android:id="@+id/product_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp" />
 
     <TextView
-        android:id="@+id/order_date"
+        android:id="@+id/product_quantity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp" />
 
     <TextView
-        android:id="@+id/order_customer_name"
+        android:id="@+id/product_price"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp" />
-
     <TextView
-        android:id="@+id/order_amount"
+        android:id="@+id/quantity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:textSize="14sp"/>
 
-    <Button
-        android:id="@+id/btn_order_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Detail"
-        android:layout_gravity="end" />
 </LinearLayout>

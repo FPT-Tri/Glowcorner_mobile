@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.mobile.Api.ApiClient;
 import com.example.mobile.Api.ApiService;
+import com.example.mobile.Models.Product;
 import com.example.mobile.R;
 import com.example.mobile.SignInActivity;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -28,11 +30,11 @@ import retrofit2.Response;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
     private static final String TAG = "ProductAdapter";
-    private List<com.example.mobile.Models.Product> productList;
+    private List<Product> productList;
     private Context context;
 
-    public ProductAdapter(List<com.example.mobile.Models.Product> productList) {
-        this.productList = productList;
+    public ProductAdapter(List<Product> productList) {
+        this.productList = productList != null ? productList : Collections.emptyList();
     }
 
     @Override
@@ -44,90 +46,81 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(ProductViewHolder holder, int position) {
-        com.example.mobile.Models.Product product = productList.get(position);
+        Product product = productList.get(position);
         holder.productIdTextView.setText(product.getProductID());
         holder.productNameTextView.setText(product.getProductName());
         holder.categoryTextView.setText(product.getCategory());
-        holder.priceTextView.setText("$" + product.getPrice());
-        holder.ratingTextView.setText(String.valueOf(product.getRating()));
-        Glide.with(holder.itemView.getContext()).load(product.getImageUrl()).into(holder.productImageView);
+        holder.priceTextView.setText(String.format("$%.2f", product.getPrice()));
+        holder.ratingTextView.setText(String.format("%.1f", product.getRating()));
 
-        // Display skin types
-        String skinTypes = String.join(", ", product.getSkinTypes());
+        // Handle skinTypes safely
+        String skinTypes = product.getSkinTypes().isEmpty() ? "N/A" : String.join(", ", product.getSkinTypes());
         holder.skinTypesTextView.setText(skinTypes);
 
+        // Handle image loading safely
+        if (!product.getImageUrl().isEmpty()) {
+            Glide.with(context).load(product.getImageUrl()).into(holder.productImageView);
+        } else {
+            holder.productImageView.setImageResource(R.drawable.bo); // Replace with a placeholder drawable
+        }
+
         // Set click listener for the "+" button
-        holder.addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String userID = SignInActivity.getStoredValue(context, "userID");
-                String productID = product.getProductID();
-                int quantity = 1;
+        holder.addButton.setOnClickListener(v -> {
+            String userID = SignInActivity.getStoredValue(context, "userID");
+            String productID = product.getProductID();
+            int quantity = 1;
 
-                if (userID == null) {
-                    Toast.makeText(context, "User not logged in", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            if (userID == null) {
+                Toast.makeText(context, "User not logged in", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                ApiService apiService = ApiClient.getClient().create(ApiService.class);
-                Call<ResponseBody> call = apiService.addToCart(userID, productID, quantity);
+            ApiService apiService = ApiClient.getClient().create(ApiService.class);
+            Call<ResponseBody> call = apiService.addToCart(userID, productID, quantity);
 
-                call.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            try {
-                                String responseString = response.body().string();
-                                Log.d(TAG, "Response String: " + responseString);
-                                if ("success".equalsIgnoreCase(responseString) || responseString.contains("\"success\":true")) {
-                                    Toast.makeText(context, "Added to cart successfully!", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(context, "Failed to add to cart: " + responseString, Toast.LENGTH_SHORT).show();
-                                }
-                            } catch (IOException e) {
-                                Log.e(TAG, "Error reading response: " + e.getMessage());
-                                Toast.makeText(context, "Error adding to cart", Toast.LENGTH_SHORT).show();
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        try {
+                            String responseString = response.body().string();
+                            Log.d(TAG, "Response String: " + responseString);
+                            if ("success".equalsIgnoreCase(responseString) || responseString.contains("\"success\":true")) {
+                                Toast.makeText(context, "Added to cart successfully!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(context, "Failed to add to cart: " + responseString, Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            // Log raw response body if available
-                            ResponseBody errorBody = response.errorBody();
-                            if (errorBody != null) {
-                                try {
-                                    String rawResponse = errorBody.string();
-                                    Log.e(TAG, "Raw Response: " + rawResponse);
-                                    Toast.makeText(context, "API Error: " + rawResponse, Toast.LENGTH_SHORT).show();
-                                } catch (Exception e) {
-                                    Log.e(TAG, "Error reading response body: " + e.getMessage());
-                                }
-                            }
+                        } catch (IOException e) {
+                            Log.e(TAG, "Error reading response: " + e.getMessage());
                             Toast.makeText(context, "Error adding to cart", Toast.LENGTH_SHORT).show();
                         }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Log.e(TAG, "API Call Failed: " + t.getMessage(), t);
-                        if (t instanceof retrofit2.HttpException) {
-                            retrofit2.HttpException httpException = (retrofit2.HttpException) t;
+                    } else {
+                        ResponseBody errorBody = response.errorBody();
+                        String errorMsg = "Error adding to cart";
+                        if (errorBody != null) {
                             try {
-                                String errorBody = httpException.response().errorBody().string();
-                                Log.e(TAG, "Error Body: " + errorBody);
-                                Toast.makeText(context, "API Error: " + errorBody, Toast.LENGTH_SHORT).show();
+                                errorMsg = errorBody.string();
+                                Log.e(TAG, "Raw Response: " + errorMsg);
                             } catch (Exception e) {
-                                Log.e(TAG, "Error reading error body: " + e.getMessage());
+                                Log.e(TAG, "Error reading response body: " + e.getMessage());
                             }
-                        } else {
-                            Toast.makeText(context, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                         }
+                        Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show();
                     }
-                });
-            }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.e(TAG, "API Call Failed: " + t.getMessage(), t);
+                    Toast.makeText(context, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 
     @Override
     public int getItemCount() {
-        return productList != null ? productList.size() : 0;
+        return productList.size();
     }
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {

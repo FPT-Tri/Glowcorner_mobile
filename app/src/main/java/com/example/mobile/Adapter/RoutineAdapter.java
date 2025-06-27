@@ -1,70 +1,65 @@
 package com.example.mobile.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobile.Models.Routine;
 import com.example.mobile.R;
-import com.example.mobile.RoutineDetailActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RoutineAdapter extends RecyclerView.Adapter<RoutineAdapter.RoutineViewHolder> {
-    private List<Routine> routines;
     private Context context;
+    private List<Routine> routineList = new ArrayList<>();
+    private OnRoutineClickListener clickListener;
 
-    public RoutineAdapter(Context context) {
-        this.context = context;
-        this.routines = new java.util.ArrayList<>();
+    public interface OnRoutineClickListener {
+        void onRoutineClick(Routine routine);
     }
 
-    @NonNull
+    public RoutineAdapter(Context context, OnRoutineClickListener clickListener) {
+        this.context = context;
+        this.clickListener = clickListener;
+    }
+
+    public void setRoutines(List<Routine> routines) {
+        this.routineList = routines;
+        notifyDataSetChanged();
+    }
+
     @Override
-    public RoutineViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_routine, parent, false);
+    public RoutineViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_routine, parent, false);
         return new RoutineViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RoutineViewHolder holder, int position) {
-        Routine routine = routines.get(position);
-        holder.routineName.setText(routine.routineName);
-        holder.routineDescription.setText(routine.routineDescription);
-        holder.cardView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, RoutineDetailActivity.class);
-            intent.putExtra("routineID", routine.routineID);
-            context.startActivity(intent);
-        });
+    public void onBindViewHolder(RoutineViewHolder holder, int position) {
+        Routine routine = routineList.get(position);
+        holder.routineNameTextView.setText(routine.getRoutineName());
+        holder.routineDescriptionTextView.setText(routine.getRoutineDescription());
+        holder.itemView.setOnClickListener(v -> clickListener.onRoutineClick(routine));
     }
 
     @Override
     public int getItemCount() {
-        return routines.size();
+        return routineList != null ? routineList.size() : 0;
     }
 
-    public void setRoutines(List<Routine> routines) {
-        this.routines = routines;
-        notifyDataSetChanged();
-    }
+    public static class RoutineViewHolder extends RecyclerView.ViewHolder {
+        public TextView routineNameTextView;
+        public TextView routineDescriptionTextView;
 
-    static class RoutineViewHolder extends RecyclerView.ViewHolder {
-        CardView cardView;
-        TextView routineName;
-        TextView routineDescription;
-
-        RoutineViewHolder(View itemView) {
+        public RoutineViewHolder(View itemView) {
             super(itemView);
-            cardView = itemView.findViewById(R.id.card_routine);
-            routineName = itemView.findViewById(R.id.routine_name);
-            routineDescription = itemView.findViewById(R.id.routine_description);
+            routineNameTextView = itemView.findViewById(R.id.routine_name);
+            routineDescriptionTextView = itemView.findViewById(R.id.routine_description);
         }
     }
 }

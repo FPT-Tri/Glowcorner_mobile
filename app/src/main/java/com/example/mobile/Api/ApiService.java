@@ -10,6 +10,7 @@ import com.example.mobile.Models.Product;
 import com.example.mobile.Models.ProductResponse;
 import com.example.mobile.Models.QuizResponse;
 import com.example.mobile.Models.RegisterRequest;
+import com.example.mobile.Models.RoutineResponse;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -26,12 +27,20 @@ import retrofit2.http.Query;
 public interface ApiService {
     @POST("auth/login")
     Call<ApiResponse> login(@Body LoginRequest loginRequest);
-
     @POST("auth/register")
     Call<ApiResponse> register(@Body RegisterRequest registerRequest);
 
+    // Get products
     @GET("api/products")
     Call<ProductResponse> getProducts();
+    @GET("api/customer/products/skinType/{skinType}")
+    Call<ProductResponse> getProductsBySkinType(@Path("skinType") String skinType);
+    @GET("api/customer/products/category/{category}")
+    Call<ProductResponse> getProductsByCategory(@Path("category") String category);
+    @GET("api/customer/products/{productID}")
+    Call<ProductResponse> getProductById(@Path("productID") String productID);
+    @GET("api/customer/products/name/{productName}")
+    Call<ProductResponse> getProductsByName(@Path("productName") String productName);
 
     // In ApiService.java
     // Add to cart
@@ -46,28 +55,25 @@ public interface ApiService {
     @GET("api/user/{userID}")
     Call<ResponseBody> getUserProfile(@Path("userID") String userID);
 
-    // Stripe Payment old
-    @POST("api/create-payment-intent")
-    Call<ResponseBody> createPaymentIntent(@Query("amount") double amount, @Query("currency") String currency, @Query("secretKey") String secretKey);
-
-    // Stripe Payment now
     @POST("/api/orders/customer/{userID}/create")
     Call<OrderResponse> createOrder(@Header("Authorization") String token, @Path("userID") String userID, @Body JsonObject orderData);
-
-    @POST("/api/payment/stripe/create-intent")
-    Call<ResponseBody> createStripePaymentIntent(@Header("Authorization") String token, @Query("amount") double amount, @Query("currency") String currency);
-
     // Get orders by user ID
     @GET("api/orders/customer/{userID}")
     Call<ResponseBody> getCustomerOrders(@Header("Authorization") String token, @Path("userID") String userID);
+    @GET("api/orders/staff/{orderId}")
+    Call<ResponseBody> getOrderDetails(@Path("orderId") String orderId);
 
     // Get Quizzes
     @GET("api/quizzes")
     Call<ResponseBody> getQuizzes();
-
     // Get Skintype by Quiz ID
     @GET("api/skin-care-routines")
     Call<ResponseBody> getSkinCareRoutines();
     @GET("api/skin-care-routines/{routineId}")
-    Call<ResponseBody> getRoutineById(@Path("routineId") String routineId);
+    Call<RoutineResponse> getRoutineById(@Path("routineId") String routineId);
+    @POST("api/skin-care-routines/{routineId}/apply-to-user/{userId}")
+    Call<RoutineResponse> applyRoutineToUser(
+            @Path("routineId") String routineId,
+            @Path("userId") String userId
+    );
 }
