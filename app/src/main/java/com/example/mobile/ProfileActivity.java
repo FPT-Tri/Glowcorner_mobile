@@ -103,7 +103,7 @@ public class ProfileActivity extends AppCompatActivity {
                             JsonObject rootObj = parser.parse(responseString).getAsJsonObject();
                             JsonObject dataObject = rootObj.getAsJsonObject("data");
 
-                            // Parse fields with correct field names
+                            // Parse fields
                             String fullname = dataObject.has("fullName") && !dataObject.get("fullName").isJsonNull()
                                     ? dataObject.get("fullName").getAsString() : "";
                             String email = dataObject.has("email") && !dataObject.get("email").isJsonNull()
@@ -114,10 +114,19 @@ public class ProfileActivity extends AppCompatActivity {
                                     ? dataObject.get("address").getAsString() : "Address not available";
                             String skinType = dataObject.has("skinType") && !dataObject.get("skinType").isJsonNull()
                                     ? dataObject.get("skinType").getAsString() : "Skin Type not available";
-                            String skinCareRoutine = dataObject.has("skinCareRoutine") && !dataObject.get("skinCareRoutine").isJsonNull()
-                                    ? dataObject.get("skinCareRoutine").getAsString() : "Skin Care Routine: Not set";
+
+                            // Handle skinCareRoutine as a JsonObject
+                            String skinCareRoutine;
+                            if (dataObject.has("skinCareRoutine") && !dataObject.get("skinCareRoutine").isJsonNull()) {
+                                JsonObject routineObj = dataObject.get("skinCareRoutine").getAsJsonObject();
+                                skinCareRoutine = routineObj.has("routineName") && !routineObj.get("routineName").isJsonNull()
+                                        ? routineObj.get("routineName").getAsString() : "Skin Care Routine: Not set";
+                            } else {
+                                skinCareRoutine = "Skin Care Routine: Not set";
+                            }
+
                             String avatarUrl = dataObject.has("avatar_url") && !dataObject.get("avatar_url").isJsonNull()
-                                    ? dataObject.get("avatar_url").getAsString() : null; // Matches the response field
+                                    ? dataObject.get("avatar_url").getAsString() : null;
 
                             // Set text fields
                             profileFullnameTextView.setText(fullname.isEmpty() ? "Name not available" : fullname);
@@ -125,17 +134,17 @@ public class ProfileActivity extends AppCompatActivity {
                             profilePhoneTextView.setText(phone);
                             profileAddressTextView.setText(address);
                             profileSkinTypeTextView.setText(skinType);
-                            profileSkinCareRoutineTextView.setText(skinCareRoutine.isEmpty() ? "Skin Care Routine: Not set" : skinCareRoutine);
+                            profileSkinCareRoutineTextView.setText(skinCareRoutine);
 
                             // Load avatar image with Glide
                             if (avatarUrl != null) {
                                 Glide.with(ProfileActivity.this)
                                         .load(avatarUrl)
-                                        .placeholder(R.drawable.ava) // Fallback if image fails
-                                        .error(R.drawable.ava) // Fallback if image fails
+                                        .placeholder(R.drawable.ava)
+                                        .error(R.drawable.ava)
                                         .into(profileAvatarImageView);
                             } else {
-                                profileAvatarImageView.setImageResource(R.drawable.ava); // Default if no URL
+                                profileAvatarImageView.setImageResource(R.drawable.ava);
                             }
 
                             // Save address to SharedPreferences if not already saved
