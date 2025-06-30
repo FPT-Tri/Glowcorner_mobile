@@ -1,6 +1,5 @@
 package com.example.mobile.Models;
 
-
 import com.google.gson.annotations.SerializedName;
 
 public class OrderResponse {
@@ -16,7 +15,7 @@ public class OrderResponse {
     @SerializedName("success")
     private boolean success;
 
-    // Getters and setters
+    // Getters
     public int getStatus() { return status; }
     public String getDescription() { return description; }
     public OrderData getData() { return data; }
@@ -62,10 +61,20 @@ public class OrderResponse {
         @SerializedName("stripePaymentMethodId")
         private String stripePaymentMethodId;
 
-        // Getters and setters
+        // Getters
         public String getOrderID() { return orderID; }
+        public String getCustomerID() { return customerID; }
+        public String getCustomerName() { return customerName; }
+        public String getOrderDate() { return orderDate; }
+        public String getStatus() { return status; }
+        public double getTotalAmount() { return totalAmount; }
+        public double getDiscountedTotalAmount() { return discountedTotalAmount; }
+        public OrderDetail[] getOrderDetails() { return orderDetails; }
         public String getPaymentIntentId() { return paymentIntentId; }
-        // Add other getters as needed
+        public String getPaymentMethodType() { return paymentMethodType; }
+        public String getPaymentBrand() { return paymentBrand; }
+        public String getPaymentLast4() { return paymentLast4; }
+        public String getStripePaymentMethodId() { return stripePaymentMethodId; }
     }
 
     public static class OrderDetail {
@@ -81,7 +90,7 @@ public class OrderResponse {
         @SerializedName("totalAmount")
         private double totalAmount;
 
-        // Getters and setters
+        // Getters
         public String getProductID() { return productID; }
         public int getQuantity() { return quantity; }
         public double getProductPrice() { return productPrice; }

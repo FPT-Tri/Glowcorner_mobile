@@ -19,15 +19,26 @@
         <activity android:name=".CartActivity" />
         <activity android:name=".CheckoutActivity" />
         <activity android:name=".HomeActivity" />
+        <activity android:name=".ManagerHomeActivity" />
         <activity android:name=".OrderDetailActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".QuizActivity" />
         <activity android:name=".ResultActivity" />
         <activity android:name=".RoutineDetailActivity" />
         <activity android:name=".SignUpActivity" />
+        <activity android:name=".StaffHomeActivity" />
         <activity android:name=".SuccessActivity" />
 
 
+        <activity android:name=".manager.ManagerUsersActivity" />
+        <activity android:name=".manager.ManagerCustomersActivity" />
+        <activity android:name=".manager.ManagerOrdersActivity" />
+        <activity android:name=".manager.ManagerProductsActivity" />
+        <activity android:name=".manager.ManagerPromotionsActivity" />
+        <activity android:name=".manager.ManagerRoutinesActivity" />
+        <activity android:name=".manager.ManagerStaffsActivity" />
+
+        <activity android:name=".staff.StaffSkinQuizActivity" />
 
 
         <activity android:name=".SignInActivity"

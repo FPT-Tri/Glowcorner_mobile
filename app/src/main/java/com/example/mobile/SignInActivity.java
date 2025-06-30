@@ -74,8 +74,8 @@ public class SignInActivity extends AppCompatActivity {
                         Log.d(TAG, "Response Code: " + response.code() + ", Body: " + (response.body() != null ? response.body().toString() : "null"));
                         if (response.isSuccessful() && response.body() != null) {
                             ApiResponse apiResponse = response.body();
-                            if (apiResponse.isSuccess()) { // Use isSuccess() instead of getStatus()
-                                Log.d(TAG, "Login Successful, Navigating to HomeActivity");
+                            if (apiResponse.isSuccess()) {
+                                Log.d(TAG, "Login Successful, Checking user role");
 
                                 // Save user details to SharedPreferences
                                 SharedPreferences prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -83,19 +83,34 @@ public class SignInActivity extends AppCompatActivity {
                                 editor.putInt("status", apiResponse.getStatus());
                                 editor.putString("description", apiResponse.getDescription());
                                 ApiResponse.Data data = apiResponse.getData();
+                                String userRole = null;
                                 if (data != null) {
                                     editor.putString("jwtToken", data.getJwtToken());
                                     editor.putString("userID", data.getUserID());
-                                    editor.putString("userRole", data.getRole()); // Use data.role
-                                    editor.putString("userEmail", data.getEmail()); // Map to email
+                                    userRole = data.getRole();
+                                    editor.putString("userRole", userRole);
+                                    editor.putString("userEmail", data.getEmail());
                                     editor.putString("fullName", data.getFullName());
-                                    editor.putString("userAddress", ""); // Not in response, default to empty
-                                    editor.putString("userPhone", "");   // Not in response, default to empty
+                                    editor.putString("userAddress", "");
+                                    editor.putString("userPhone", "");
                                 }
                                 editor.apply();
 
                                 Toast.makeText(SignInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+
+                                // Navigate based on userRole
+                                Intent intent;
+                                if ("CUSTOMER".equals(userRole)) {
+                                    intent = new Intent(SignInActivity.this, HomeActivity.class);
+                                } else if ("STAFF".equals(userRole)) {
+                                    intent = new Intent(SignInActivity.this, StaffHomeActivity.class);
+                                } else if ("MANAGER".equals(userRole)) {
+                                    intent = new Intent(SignInActivity.this, ManagerHomeActivity.class);
+                                } else {
+                                    Log.w(TAG, "Unknown user role: " + userRole);
+                                    Toast.makeText(SignInActivity.this, "Unknown user role", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 startActivity(intent);
                                 finish();
                             } else {
@@ -116,7 +131,7 @@ public class SignInActivity extends AppCompatActivity {
 
                         // Fallback to static check if API fails
                         if (username.equals(STATIC_USERNAME) && password.equals(STATIC_PASSWORD)) {
-                            Log.d(TAG, "Login Successful with static credentials, Navigating to HomeActivity");
+                            Log.d(TAG, "Login Successful with static credentials, Checking user role");
                             // Save static login details to SharedPreferences
                             SharedPreferences prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = prefs.edit();
@@ -124,7 +139,9 @@ public class SignInActivity extends AppCompatActivity {
                             editor.putString("description", "Login successful! (Static fallback)");
                             editor.putString("jwtToken", "dummy-jwt");
                             editor.putString("userID", "dummy-id");
-                            editor.putString("userRole", "CUSTOMER");
+                            // Static role for testing, assuming CUSTOMER for simplicity
+                            String userRole = "CUSTOMER"; // Change to STAFF or MANAGER for testing
+                            editor.putString("userRole", userRole);
                             editor.putString("userEmail", "user@example.com");
                             editor.putString("fullName", "Dummy User");
                             editor.putString("userAddress", "Dummy Address");
@@ -132,7 +149,20 @@ public class SignInActivity extends AppCompatActivity {
                             editor.apply();
 
                             Toast.makeText(SignInActivity.this, "Login successful! (Static fallback)", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+
+                            // Navigate based on userRole
+                            Intent intent;
+                            if ("CUSTOMER".equals(userRole)) {
+                                intent = new Intent(SignInActivity.this, HomeActivity.class);
+                            } else if ("STAFF".equals(userRole)) {
+                                intent = new Intent(SignInActivity.this, StaffHomeActivity.class);
+                            } else if ("MANAGER".equals(userRole)) {
+                                intent = new Intent(SignInActivity.this, ManagerHomeActivity.class);
+                            } else {
+                                Log.w(TAG, "Unknown user role: " + userRole);
+                                Toast.makeText(SignInActivity.this, "Unknown user role", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                             startActivity(intent);
                             finish();
                         } else {

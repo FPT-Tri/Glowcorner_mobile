@@ -61,6 +61,16 @@
                     android:layout_marginTop="4dp" />
 
                 <TextView
+                    android:id="@+id/unpaid_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This order is unpaid. Please proceed to checkout."
+                    android:textSize="16sp"
+                    android:textColor="#FF0000"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+
+                <TextView
                     android:id="@+id/order_total_amount_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -69,6 +79,16 @@
                     android:textStyle="bold"
                     android:textColor="#000000"
                     android:layout_marginTop="8dp" />
+
+                <Button
+                    android:id="@+id/checkout_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Checkout"
+                    android:backgroundTint="#4CAF50"
+                    android:textColor="@android:color/white"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

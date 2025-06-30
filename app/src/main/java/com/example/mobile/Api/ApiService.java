@@ -21,6 +21,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -55,6 +56,7 @@ public interface ApiService {
     @GET("api/user/{userID}")
     Call<ResponseBody> getUserProfile(@Path("userID") String userID);
 
+
     @POST("/api/orders/customer/{userID}/create")
     Call<OrderResponse> createOrder(@Header("Authorization") String token, @Path("userID") String userID, @Body JsonObject orderData);
     // Get orders by user ID
@@ -62,6 +64,9 @@ public interface ApiService {
     Call<ResponseBody> getCustomerOrders(@Header("Authorization") String token, @Path("userID") String userID);
     @GET("api/orders/staff/{orderId}")
     Call<ResponseBody> getOrderDetails(@Path("orderId") String orderId);
+    @PUT("orders/staff/{orderId}")
+    Call<ResponseBody> updateOrderStatus(@Path("orderId") String orderId, @Body String status);
+
 
     // Get Quizzes
     @GET("api/quizzes")

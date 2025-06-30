@@ -49,10 +49,43 @@ public class SuccessActivity extends AppCompatActivity {
         orderDetailsRecyclerView.setAdapter(adapter);
 
         backToHomeButton.setOnClickListener(v -> {
-            Intent intent = new Intent(SuccessActivity.this, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
+            SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+            String orderID = prefs.getString("orderID", null);
+            if (orderID == null) {
+                Toast.makeText(SuccessActivity.this, "Order ID not found.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            ApiService apiService = ApiClient.getClient().create(ApiService.class);
+            Call<ResponseBody> call = apiService.updateOrderStatus(orderID, "COMPLETED");
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    try {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(SuccessActivity.this, "Order status updated to COMPLETED!", Toast.LENGTH_SHORT).show();
+                            // Clear orderID from SharedPreferences
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.remove("orderID");
+                            editor.apply();
+                            // Navigate to HomeActivity
+                            Intent intent = new Intent(SuccessActivity.this, HomeActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(SuccessActivity.this, "Failed to update order status.", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(SuccessActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(SuccessActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         loadOrderDetails();

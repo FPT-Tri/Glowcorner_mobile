@@ -1,8 +1,11 @@
 package com.example.mobile;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +17,7 @@ import com.example.mobile.Adapter.OrderDetailAdapter;
 import com.example.mobile.Api.ApiClient;
 import com.example.mobile.Api.ApiService;
 import com.example.mobile.Models.OrderDetail;
+import com.example.mobile.Models.OrderResponse;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -23,7 +27,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -33,8 +39,9 @@ import retrofit2.Response;
 
 public class OrderDetailActivity extends AppCompatActivity {
     private static final String TAG = "OrderDetailActivity";
-    private TextView orderIdTextView, orderDateTextView, customerNameTextView, totalAmountTextView, statusTextView;
+    private TextView orderIdTextView, orderDateTextView, customerNameTextView, totalAmountTextView, statusTextView, unpaidMessageTextView;
     private RecyclerView orderDetailsRecyclerView;
+    private Button checkoutButton;
     private OrderDetailAdapter orderDetailAdapter;
     private List<OrderDetail> orderDetailsList;
 
@@ -49,6 +56,8 @@ public class OrderDetailActivity extends AppCompatActivity {
         customerNameTextView = findViewById(R.id.order_customer_name_detail);
         totalAmountTextView = findViewById(R.id.order_total_amount_detail);
         statusTextView = findViewById(R.id.order_status_detail);
+        unpaidMessageTextView = findViewById(R.id.unpaid_message);
+        checkoutButton = findViewById(R.id.checkout_button);
         orderDetailsRecyclerView = findViewById(R.id.order_details_recycler_view);
 
         // Initialize RecyclerView
@@ -86,11 +95,23 @@ public class OrderDetailActivity extends AppCompatActivity {
                             JsonObject dataObject = rootObj.getAsJsonObject("data");
 
                             // Set order information
+                            String status = dataObject.get("status").getAsString();
                             orderIdTextView.setText(dataObject.get("orderID").getAsString());
                             orderDateTextView.setText(dataObject.get("orderDate").getAsString());
                             customerNameTextView.setText(dataObject.get("customerName").getAsString());
-                            totalAmountTextView.setText("$" + dataObject.get("totalAmount").getAsDouble());
-                            statusTextView.setText(dataObject.get("status").getAsString());
+                            double totalAmount = dataObject.get("totalAmount").getAsDouble();
+                            totalAmountTextView.setText("$" + totalAmount);
+                            statusTextView.setText(status);
+
+                            // Handle PENDING status
+                            if ("PENDING".equals(status)) {
+                                unpaidMessageTextView.setVisibility(View.VISIBLE);
+                                checkoutButton.setVisibility(View.VISIBLE);
+                                checkoutButton.setOnClickListener(v -> handleCheckout(orderId, totalAmount));
+                            } else {
+                                unpaidMessageTextView.setVisibility(View.GONE);
+                                checkoutButton.setVisibility(View.GONE);
+                            }
 
                             // Set order details
                             orderDetailsList.clear();
@@ -126,6 +147,62 @@ public class OrderDetailActivity extends AppCompatActivity {
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e(TAG, "API Call Failed for order details: " + t.getMessage(), t);
                 Toast.makeText(OrderDetailActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void handleCheckout(String orderId, double totalAmount) {
+        String userID = SignInActivity.getStoredValue(this, "userID");
+        String jwtToken = SignInActivity.getStoredValue(this, "jwtToken");
+        if (userID == null || jwtToken == null) {
+            Toast.makeText(this, "Please log in to proceed with checkout", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if user has an address
+        String address = SignInActivity.getStoredValue(this, "userAddress");
+        if (address == null || address.isEmpty()) {
+            Toast.makeText(this, "Please add your address in Profile", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(OrderDetailActivity.this, ProfileActivity.class));
+            return;
+        }
+
+        // Since order already exists, we may need to retrieve or update payment intent
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        JsonObject orderData = new JsonObject();
+        orderData.addProperty("orderID", orderId);
+        orderData.addProperty("totalAmount", totalAmount);
+        orderData.addProperty("status", "PENDING");
+
+        Call<OrderResponse> call = apiService.createOrder("Bearer " + jwtToken, userID, orderData);
+        call.enqueue(new Callback<OrderResponse>() {
+            @Override
+            public void onResponse(Call<OrderResponse> call, Response<OrderResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    String clientSecret = response.body().getData().getPaymentIntentId();
+                    String returnedOrderID = response.body().getData().getOrderID();
+                    double discountedTotalAmount = response.body().getData().getDiscountedTotalAmount();
+
+                    // Store orderID in SharedPreferences
+                    SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("orderID", returnedOrderID);
+                    editor.apply();
+
+                    Log.d(TAG, "Received clientSecret = " + clientSecret);
+                    Intent intent = new Intent(OrderDetailActivity.this, CheckoutActivity.class);
+                    intent.putExtra("clientSecret", clientSecret);
+                    intent.putExtra("totalAmount", totalAmount);
+                    intent.putExtra("discountedAmount", discountedTotalAmount);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(OrderDetailActivity.this, "Failed to prepare checkout", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<OrderResponse> call, Throwable t) {
+                Toast.makeText(OrderDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
