@@ -1,6 +1,8 @@
 package com.example.mobile.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,21 +52,45 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.productIdTextView.setText(product.getProductID());
         holder.productNameTextView.setText(product.getProductName());
         holder.categoryTextView.setText(product.getCategory());
-        holder.priceTextView.setText(String.format("$%.2f", product.getPrice()));
         holder.ratingTextView.setText(String.format("%.1f", product.getRating()));
 
-        // Handle skinTypes safely
+        // Skin types
         String skinTypes = product.getSkinTypes().isEmpty() ? "N/A" : String.join(", ", product.getSkinTypes());
         holder.skinTypesTextView.setText(skinTypes);
 
-        // Handle image loading safely
+        // New logic: show both price and discountedPrice if price > discountedPrice
+        Double price = product.getPrice();
+        Double discountedPrice = product.getDiscountedPrice();
+
+        if (discountedPrice != null && price > discountedPrice) {
+            // Show both prices
+            holder.priceTextView.setVisibility(View.VISIBLE);
+            holder.discountedPriceTextView.setVisibility(View.VISIBLE);
+
+            holder.priceTextView.setText(String.format("$%.2f", price));
+            holder.priceTextView.setPaintFlags(holder.priceTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.priceTextView.setTextColor(Color.RED);
+
+            holder.discountedPriceTextView.setText(String.format("$%.2f", discountedPrice));
+            holder.discountedPriceTextView.setTextColor(Color.RED);
+        } else {
+            // Show only price
+            holder.priceTextView.setVisibility(View.VISIBLE);
+            holder.discountedPriceTextView.setVisibility(View.GONE);
+
+            holder.priceTextView.setText(String.format("$%.2f", price));
+            holder.priceTextView.setPaintFlags(holder.priceTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            holder.priceTextView.setTextColor(Color.BLACK);
+        }
+
+        // Load image
         if (!product.getImageUrl().isEmpty()) {
             Glide.with(context).load(product.getImageUrl()).into(holder.productImageView);
         } else {
-            holder.productImageView.setImageResource(R.drawable.bo); // Replace with a placeholder drawable
+            holder.productImageView.setImageResource(R.drawable.bo); // fallback image
         }
 
-        // Set click listener for the "+" button
+        // Add to cart
         holder.addButton.setOnClickListener(v -> {
             String userID = SignInActivity.getStoredValue(context, "userID");
             String productID = product.getProductID();
@@ -123,8 +149,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         return productList.size();
     }
 
+    public void updateData(List<Product> newProductList) {
+        this.productList = newProductList != null ? newProductList : Collections.emptyList();
+        notifyDataSetChanged();
+    }
+
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
-        public TextView productIdTextView, productNameTextView, categoryTextView, priceTextView, ratingTextView, skinTypesTextView;
+        public TextView productIdTextView, productNameTextView, categoryTextView, priceTextView, discountedPriceTextView, ratingTextView, skinTypesTextView;
         public ImageView productImageView;
         public Button addButton;
 
@@ -134,6 +165,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             productNameTextView = itemView.findViewById(R.id.product_name);
             categoryTextView = itemView.findViewById(R.id.category);
             priceTextView = itemView.findViewById(R.id.price);
+            discountedPriceTextView = itemView.findViewById(R.id.discounted_price);
             ratingTextView = itemView.findViewById(R.id.rating);
             skinTypesTextView = itemView.findViewById(R.id.skin_types);
             productImageView = itemView.findViewById(R.id.product_image);

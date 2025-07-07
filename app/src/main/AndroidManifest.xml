@@ -31,12 +31,20 @@
 
 
         <activity android:name=".manager.ManagerUsersActivity" />
+        <activity android:name=".manager.ManagerEditUserActivity" />
         <activity android:name=".manager.ManagerCustomersActivity" />
+        <activity android:name=".manager.ManagerStaffsActivity" />
+
         <activity android:name=".manager.ManagerOrdersActivity" />
-        <activity android:name=".manager.ManagerProductsActivity" />
+
         <activity android:name=".manager.ManagerPromotionsActivity" />
         <activity android:name=".manager.ManagerRoutinesActivity" />
-        <activity android:name=".manager.ManagerStaffsActivity" />
+
+        <activity android:name=".manager.ManagerProductsActivity" />
+        <activity android:name=".manager.EditProductActivity" />
+        <activity android:name=".manager.CreateProductActivity" />
+
+
 
         <activity android:name=".staff.StaffSkinQuizActivity" />
 

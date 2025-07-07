@@ -4,4 +4,17 @@
     <string name="category_prompt">Select Category</string>
     <string name="search_hint">Enter Product ID or Name</string>
     <string name="search_button">Search</string>
+    <string-array name="skin_types">
+        <item>Combination</item>
+        <item>Normal</item>
+        <item>Oily</item>
+        <item>Dry</item>
+        <item>Sensitive</item>
+    </string-array>
+    <string-array name="user_roles">
+        <item>MANAGER</item>
+        <item>STAFF</item>
+        <item>CUSTOMER</item>
+    </string-array>
+
 </resources>

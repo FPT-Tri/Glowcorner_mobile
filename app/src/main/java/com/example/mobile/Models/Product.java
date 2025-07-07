@@ -46,6 +46,40 @@ public class Product {
         this.image_url = image_url;
         this.category = category;
         this.rating = rating;
+        this.discountedPrice = null;
+        this.skinTypes = Collections.emptyList();
+        this.status = "";
+    }
+
+    // Constructor to match EditProductActivity usage
+    public Product(String productID, String productName, String description, float price,
+                   String category, List<String> skinTypes, float rating, String imageUrl) {
+        this.productID = productID;
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.category = category;
+        this.skinTypes = skinTypes != null ? skinTypes : Collections.emptyList();
+        this.rating = rating;
+        this.image_url = imageUrl;
+        this.discountedPrice = null;
+        this.status = "";
+    }
+
+    // Full constructor
+    public Product(String productID, String productName, String description, double price,
+                   Double discountedPrice, List<String> skinTypes, String category,
+                   double rating, String image_url, String status) {
+        this.productID = productID;
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.discountedPrice = discountedPrice;
+        this.skinTypes = skinTypes != null ? skinTypes : Collections.emptyList();
+        this.category = category;
+        this.rating = rating;
+        this.image_url = image_url;
+        this.status = status;
     }
 
     // Getters with null checks
