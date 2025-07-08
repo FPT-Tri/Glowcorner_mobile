@@ -1,11 +1,14 @@
 package com.example.mobile.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Collections;
 import java.util.List;
 
-public class Product {
+public class Product implements Parcelable {
     @SerializedName("productID")
     private String productID;
 
@@ -93,4 +96,49 @@ public class Product {
     public double getRating() { return rating; }
     public String getImageUrl() { return image_url != null ? image_url : ""; }
     public String getStatus() { return status != null ? status : ""; }
+
+    // Parcelable implementation
+    protected Product(Parcel in) {
+        productID = in.readString();
+        productName = in.readString();
+        description = in.readString();
+        price = in.readDouble();
+        discountedPrice = (Double) in.readValue(Double.class.getClassLoader());
+        skinTypes = in.createStringArrayList();
+        category = in.readString();
+        rating = in.readDouble();
+        image_url = in.readString();
+        status = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(productID);
+        dest.writeString(productName);
+        dest.writeString(description);
+        dest.writeDouble(price);
+        dest.writeValue(discountedPrice);
+        dest.writeStringList(skinTypes);
+        dest.writeString(category);
+        dest.writeDouble(rating);
+        dest.writeString(image_url);
+        dest.writeString(status);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Product> CREATOR = new Creator<Product>() {
+        @Override
+        public Product createFromParcel(Parcel in) {
+            return new Product(in);
+        }
+
+        @Override
+        public Product[] newArray(int size) {
+            return new Product[size];
+        }
+    };
 }

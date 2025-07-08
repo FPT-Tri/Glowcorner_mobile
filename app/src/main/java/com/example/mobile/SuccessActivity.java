@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mobile.Adapter.OrderDetailsAdapter;
+import com.example.mobile.Adapter.OrderDetailsSuccessAdapter;
 import com.example.mobile.Api.ApiClient;
 import com.example.mobile.Api.ApiService;
 
@@ -29,7 +29,7 @@ import retrofit2.Response;
 public class SuccessActivity extends AppCompatActivity {
     private TextView orderIdTextView, customerNameTextView, orderDateTextView, totalAmountTextView;
     private RecyclerView orderDetailsRecyclerView;
-    private OrderDetailsAdapter adapter;
+    private OrderDetailsSuccessAdapter adapter;
     private Button backToHomeButton;
 
     @Override
@@ -45,7 +45,7 @@ public class SuccessActivity extends AppCompatActivity {
         backToHomeButton = findViewById(R.id.back_to_home_button);
 
         orderDetailsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new OrderDetailsAdapter();
+        adapter = new OrderDetailsSuccessAdapter();
         orderDetailsRecyclerView.setAdapter(adapter);
 
         backToHomeButton.setOnClickListener(v -> {
@@ -121,10 +121,10 @@ public class SuccessActivity extends AppCompatActivity {
                         totalAmountTextView.setText("Total Amount: $" + totalAmount);
 
                         JSONArray orderDetailsArray = data.getJSONArray("orderDetails");
-                        List<OrderDetailsAdapter.OrderDetail> orderDetails = new ArrayList<>();
+                        List<OrderDetailsSuccessAdapter.OrderDetail> orderDetails = new ArrayList<>();
                         for (int i = 0; i < orderDetailsArray.length(); i++) {
                             JSONObject detail = orderDetailsArray.getJSONObject(i);
-                            OrderDetailsAdapter.OrderDetail orderDetail = new OrderDetailsAdapter.OrderDetail(
+                            OrderDetailsSuccessAdapter.OrderDetail orderDetail = new OrderDetailsSuccessAdapter.OrderDetail(
                                     detail.getString("productName"),
                                     detail.getInt("quantity"),
                                     detail.getDouble("productPrice"),

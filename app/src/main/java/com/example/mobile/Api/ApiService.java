@@ -1,23 +1,18 @@
 package com.example.mobile.Api;
 
-import com.example.mobile.Models.AddToCartRequest;
-import com.example.mobile.Models.AddToCartResponse;
 import com.example.mobile.Models.CartResponse;
 import com.example.mobile.Models.LoginRequest;
 import com.example.mobile.Models.OrderResponse;
-import com.example.mobile.Models.Product;
 import com.example.mobile.Models.ProductResponse;
-import com.example.mobile.Models.QuizResponse;
+import com.example.mobile.Models.Promotion;
 import com.example.mobile.Models.RegisterRequest;
 import com.example.mobile.Models.RoutineResponse;
 import com.example.mobile.Models.User;
-import com.example.mobile.Models.UserResponse;
 import com.google.gson.JsonObject;
 
 import java.util.List;
 
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -81,6 +76,8 @@ public interface ApiService {
     Call<Void> deleteManagerUser(@Path("userId") String userId);
 
     //--------------------------------------------------------------------------------------------------
+    @GET("api/orders/staff")
+    Call<ResponseBody> getOrders(@Header("Authorization") String authHeader);
     @POST("/api/orders/customer/{userID}/create")
     Call<OrderResponse> createOrder(@Header("Authorization") String token, @Path("userID") String userID, @Body JsonObject orderData);
     // Get orders by user ID
@@ -90,7 +87,8 @@ public interface ApiService {
     Call<ResponseBody> getOrderDetails(@Path("orderId") String orderId);
     @PUT("orders/staff/{orderId}")
     Call<ResponseBody> updateOrderStatus(@Path("orderId") String orderId, @Body String status);
-
+    @DELETE("api/orders/{orderId}")
+    Call<ResponseBody> deleteOrder(@Header("Authorization") String authHeader, @Path("orderId") String orderId);
     //--------------------------------------------------------------------------------------------------
     // Get Quizzes
     @GET("api/quizzes")
@@ -105,4 +103,19 @@ public interface ApiService {
             @Path("routineId") String routineId,
             @Path("userId") String userId
     );
+
+    //--------------------------------------------------------------------------------------------------
+    // Promotions
+    @GET("api/promotions")
+    Call<ResponseBody> getPromotions(@Header("Authorization") String authHeader);
+    @GET("api/promotions/search")
+    Call<ResponseBody> searchPromotions(@Header("Authorization") String authHeader, @Query("name") String name, @Query("description") String description);
+    @GET("api/promotions/{promotionID}")
+    Call<ResponseBody> getPromotionById(@Header("Authorization") String authHeader, @Path("promotionID") String promotionID);
+    @GET("api/promotions/active/product")
+    Call<ResponseBody> getActivePromotionsByProduct(@Header("Authorization") String authHeader, @Query("productID") String productID);
+    @PUT("api/promotions/{promotionID}")
+    Call<ResponseBody> updatePromotion(@Header("Authorization") String authHeader, @Path("promotionID") String promotionID, @Body Promotion promotion);
+    @DELETE("api/promotions/{promotionID}")
+    Call<ResponseBody> deletePromotion(@Header("Authorization") String authToken, @Path("promotionID") String promotionId);
 }

@@ -13,7 +13,7 @@ import com.example.mobile.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderDetailsAdapter extends RecyclerView.Adapter<OrderDetailsAdapter.OrderDetailViewHolder> {
+public class OrderDetailsSuccessAdapter extends RecyclerView.Adapter<OrderDetailsSuccessAdapter.OrderDetailViewHolder> {
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
     public void setOrderDetails(List<OrderDetail> orderDetails) {

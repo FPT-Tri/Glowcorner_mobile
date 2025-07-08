@@ -98,13 +98,20 @@ public class OrderDetailActivity extends AppCompatActivity {
                             String status = dataObject.get("status").getAsString();
                             orderIdTextView.setText(dataObject.get("orderID").getAsString());
                             orderDateTextView.setText(dataObject.get("orderDate").getAsString());
-                            customerNameTextView.setText(dataObject.get("customerName").getAsString());
+                            String customerName = dataObject.get("customerName").isJsonNull()
+                                    ? "Unknown Customer"
+                                    : dataObject.get("customerName").getAsString();
+                            customerNameTextView.setText(customerName);
                             double totalAmount = dataObject.get("totalAmount").getAsDouble();
                             totalAmountTextView.setText("$" + totalAmount);
                             statusTextView.setText(status);
 
-                            // Handle PENDING status
-                            if ("PENDING".equals(status)) {
+                            // Check user role to hide checkout for staff
+                            String userRole = SignInActivity.getStoredValue(OrderDetailActivity.this, "userRole");
+                            if ("STAFF".equals(userRole)) {
+                                unpaidMessageTextView.setVisibility(View.GONE);
+                                checkoutButton.setVisibility(View.GONE);
+                            } else if ("PENDING".equals(status)) {
                                 unpaidMessageTextView.setVisibility(View.VISIBLE);
                                 checkoutButton.setVisibility(View.VISIBLE);
                                 checkoutButton.setOnClickListener(v -> handleCheckout(orderId, totalAmount));

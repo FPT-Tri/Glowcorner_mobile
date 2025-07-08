@@ -38,6 +38,10 @@
         <activity android:name=".manager.ManagerOrdersActivity" />
 
         <activity android:name=".manager.ManagerPromotionsActivity" />
+<!--        <activity android:name=".manager.CreatePromotionActivity" />-->
+        <activity android:name=".manager.EditPromotionActivity" />
+
+
         <activity android:name=".manager.ManagerRoutinesActivity" />
 
         <activity android:name=".manager.ManagerProductsActivity" />

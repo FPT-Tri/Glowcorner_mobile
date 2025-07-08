@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mobile.Adapter.ProductAdapter;
+import com.example.mobile.Adapter.HomeProductAdapter;
 import com.example.mobile.Api.ApiClient;
 import com.example.mobile.Api.ApiService;
 import com.example.mobile.Models.Product;
@@ -32,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivity";
 
     private RecyclerView recyclerView;
-    private ProductAdapter adapter;
+    private HomeProductAdapter adapter;
     private TextView userIdTextView;
     private Spinner skinTypeSpinner;
     private Spinner categorySpinner;
@@ -73,7 +73,7 @@ public class HomeActivity extends AppCompatActivity {
         searchButton = findViewById(R.id.search_button);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ProductAdapter(null);
+        adapter = new HomeProductAdapter(null);
         recyclerView.setAdapter(adapter);
 
         // Display user ID from SharedPreferences
@@ -135,45 +135,32 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    // Sửa lại giống ManagerProductsActivity: dùng updateData thay vì tạo adapter mới
     private void searchProduct(String query) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<ProductResponse> call;
-
-        // Assume query is a productID if it matches a numeric pattern, otherwise treat as productName
-        if (query.matches("\\d+")) { // Simple check for numeric productID
-            call = apiService.getProductById(query);
-        } else {
-            call = apiService.getProductsByName(query);
-        }
-
-        Log.d(TAG, "Search Request URL: " + call.request().url());
+        Call<ProductResponse> call = query.matches("\\d+") ?
+                apiService.getProductById(query) :
+                apiService.getProductsByName(query);
 
         call.enqueue(new Callback<ProductResponse>() {
             @Override
             public void onResponse(Call<ProductResponse> call, Response<ProductResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     List<Product> products = response.body().getData();
-                    if (products != null && !products.isEmpty()) {
-                        adapter = new ProductAdapter(products);
-                        recyclerView.setAdapter(adapter);
-                    } else {
-                        Toast.makeText(HomeActivity.this, "No products found", Toast.LENGTH_SHORT).show();
-                    }
+                    adapter.updateData(products);
                 } else {
-                    String errorMsg = response.body() != null ? response.body().getDescription() : response.message();
-                    Log.e(TAG, "Search Response unsuccessful: " + errorMsg);
-                    Toast.makeText(HomeActivity.this, "Failed to search products: " + errorMsg, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, "No products found", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ProductResponse> call, Throwable t) {
-                Log.e(TAG, "Search API Call Failed: " + t.getMessage(), t);
                 Toast.makeText(HomeActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    // Sửa lại giống ManagerProductsActivity: dùng updateData thay vì tạo adapter mới
     private void loadFilteredProducts(String skinType, String category) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<ProductResponse> call;
@@ -186,29 +173,18 @@ public class HomeActivity extends AppCompatActivity {
             call = apiService.getProductsByCategory(category);
         }
 
-        Log.d(TAG, "Request URL: " + call.request().url());
-
         call.enqueue(new Callback<ProductResponse>() {
             @Override
             public void onResponse(Call<ProductResponse> call, Response<ProductResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    List<Product> products = response.body().getData();
-                    if (products != null && !products.isEmpty()) {
-                        adapter = new ProductAdapter(products);
-                        recyclerView.setAdapter(adapter);
-                    } else {
-                        Toast.makeText(HomeActivity.this, "No products available", Toast.LENGTH_SHORT).show();
-                    }
+                    adapter.updateData(response.body().getData());
                 } else {
-                    String errorMsg = response.body() != null ? response.body().getDescription() : response.message();
-                    Log.e(TAG, "Response unsuccessful: " + errorMsg);
-                    Toast.makeText(HomeActivity.this, "Failed to load products: " + errorMsg, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, "No products available", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ProductResponse> call, Throwable t) {
-                Log.e(TAG, "API Call Failed: " + t.getMessage(), t);
                 Toast.makeText(HomeActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
