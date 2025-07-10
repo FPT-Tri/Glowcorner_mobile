@@ -26,6 +26,7 @@
         <activity android:name=".QuizActivity" />
         <activity android:name=".ResultActivity" />
         <activity android:name=".RoutineDetailActivity" />
+        <activity android:name=".UserRoutineActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".StaffHomeActivity" />
         <activity android:name=".SuccessActivity" />

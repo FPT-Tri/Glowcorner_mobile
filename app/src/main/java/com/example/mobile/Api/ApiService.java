@@ -11,6 +11,7 @@ import com.example.mobile.Models.Routine;
 import com.example.mobile.Models.RoutineResponse;
 import com.example.mobile.Models.User;
 
+import com.example.mobile.Models.UserRoutineResponse;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -77,6 +78,9 @@ public interface ApiService {
     // Get user profile
     @GET("api/user/{userID}")
     Call<ResponseBody> getUserProfile(@Path("userID") String userID);
+    // Get user routine
+    @GET("/api/user/{userID}")
+    Call<UserRoutineResponse> getUserById(@Path("userID") String userId);
     // All user
     @GET("api/manager/users")
     Call<List<User>> getManagerUsers(); // Changed to return List<User>
