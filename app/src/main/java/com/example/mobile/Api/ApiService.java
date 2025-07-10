@@ -1,13 +1,16 @@
 package com.example.mobile.Api;
 
 import com.example.mobile.Models.CartResponse;
+import com.example.mobile.Models.FeedbackResponse;
 import com.example.mobile.Models.LoginRequest;
 import com.example.mobile.Models.OrderResponse;
 import com.example.mobile.Models.ProductResponse;
 import com.example.mobile.Models.Promotion;
 import com.example.mobile.Models.RegisterRequest;
+import com.example.mobile.Models.Routine;
 import com.example.mobile.Models.RoutineResponse;
 import com.example.mobile.Models.User;
+
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -35,6 +38,8 @@ public interface ApiService {
     // Get products
     @GET("api/products")
     Call<ProductResponse> getProducts();
+    @GET("api/products/{id}")
+    Call<ProductResponse> getProductById(@Path("id") String id);
     @DELETE("api/products/{productID}")
     Call<Void> deleteProduct(@Path("productID") String productID);
     @POST("api/products")
@@ -46,13 +51,13 @@ public interface ApiService {
             @Part("product") JsonObject productData,
             @Part MultipartBody.Part image
     );
-
+    // Get products by various filters
     @GET("api/customer/products/skinType/{skinType}")
     Call<ProductResponse> getProductsBySkinType(@Path("skinType") String skinType);
     @GET("api/customer/products/category/{category}")
     Call<ProductResponse> getProductsByCategory(@Path("category") String category);
     @GET("api/customer/products/{productID}")
-    Call<ProductResponse> getProductById(@Path("productID") String productID);
+    Call<ProductResponse> getFilterProductById(@Path("productID") String productID);
     @GET("api/customer/products/name/{productName}")
     Call<ProductResponse> getProductsByName(@Path("productName") String productName);
 
@@ -60,10 +65,13 @@ public interface ApiService {
     // Add to cart
     @POST("api/cart/{userID}/add/{productID}")
     Call<ResponseBody> addToCart(@Path("userID") String userID, @Path("productID") String productID, @Query("quantity") int quantity);
-
     // Show cart
     @GET("api/cart/{userID}") // Adjust endpoint as needed
     Call<CartResponse> getCart(@Path("userID") String userID);
+    @PUT("api/cart/{userID}/{productID}")
+    Call<ResponseBody> updateCartItem(@Path("userID") String userID, @Path("productID") String productID, @Query("quantity") int quantity);
+    @DELETE("api/cart/{userID}/remove/{productID}")
+    Call<ResponseBody> removeFromCart(@Path("userID") String userID, @Path("productID") String productID);
 
     //--------------------------------------------------------------------------------------------------
     // Get user profile
@@ -76,6 +84,7 @@ public interface ApiService {
     Call<Void> deleteManagerUser(@Path("userId") String userId);
 
     //--------------------------------------------------------------------------------------------------
+    // Orders
     @GET("api/orders/staff")
     Call<ResponseBody> getOrders(@Header("Authorization") String authHeader);
     @POST("/api/orders/customer/{userID}/create")
@@ -89,20 +98,45 @@ public interface ApiService {
     Call<ResponseBody> updateOrderStatus(@Path("orderId") String orderId, @Body String status);
     @DELETE("api/orders/{orderId}")
     Call<ResponseBody> deleteOrder(@Header("Authorization") String authHeader, @Path("orderId") String orderId);
+
     //--------------------------------------------------------------------------------------------------
-    // Get Quizzes
+    // Quizzes
     @GET("api/quizzes")
     Call<ResponseBody> getQuizzes();
+    @GET("api/quizzes/{questionId}")
+    Call<ResponseBody> getQuizById(@Path("questionId") String questionId);
+    @POST("api/quizzes")
+    Call<ResponseBody> createQuiz(@Body String quizData);
+    @PUT("api/quizzes/{questionId}")
+    Call<ResponseBody> updateQuiz(@Path("questionId") String questionId, @Body String quizData);
+
+    //--------------------------------------------------------------------------------------------------
     // Get Skintype by Quiz ID
     @GET("api/skin-care-routines")
-    Call<ResponseBody> getSkinCareRoutines();
+    Call<ResponseBody> getSkinCareResult();
     @GET("api/skin-care-routines/{routineId}")
-    Call<RoutineResponse> getRoutineById(@Path("routineId") String routineId);
+    Call<RoutineResponse> getRoutineById1(@Path("routineId") String routineId);
+
+    //--------------------------------------------------------------------------------------------------
+    // Routine
+    @GET("api/skin-care-routines")
+    Call<List<Routine>> getSkinCareRoutines();
+    @GET("api/skin-care-routines/skinType/{skinType}")
+    Call<List<Routine>> getRoutinesBySkinType(@Path("skinType") String skinType);
+
+    @GET("api/skin-care-routines/search")
+    Call<List<Routine>> searchRoutinesByName(@Path("name") String name);
+    @GET("api/skin-care-routines/{routineID}")
+    Call<List<Routine>> getRoutineById(@Path("routineID") String routineID);
+
+
     @POST("api/skin-care-routines/{routineId}/apply-to-user/{userId}")
     Call<RoutineResponse> applyRoutineToUser(
             @Path("routineId") String routineId,
             @Path("userId") String userId
     );
+
+
 
     //--------------------------------------------------------------------------------------------------
     // Promotions
@@ -118,4 +152,11 @@ public interface ApiService {
     Call<ResponseBody> updatePromotion(@Header("Authorization") String authHeader, @Path("promotionID") String promotionID, @Body Promotion promotion);
     @DELETE("api/promotions/{promotionID}")
     Call<ResponseBody> deletePromotion(@Header("Authorization") String authToken, @Path("promotionID") String promotionId);
+
+    //--------------------------------------------------------------------------------------------------
+    // Feedbacks
+    @GET("/api/feedbacks")
+    Call<FeedbackResponse> getFeedbacks();
+    @DELETE("/api/feedbacks/{feedbackID}")
+    Call<Void> deleteFeedback(@Path("feedbackID") String feedbackID);
 }

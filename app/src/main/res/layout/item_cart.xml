@@ -35,17 +35,54 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/cart_quantity"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/decrement_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="14sp"
+            android:padding="4dp" />
+
+        <TextView
+            android:id="@+id/cart_quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginHorizontal="8dp" />
+
+        <Button
+            android:id="@+id/increment_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:textSize="14sp"
+            android:padding="4dp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/cart_total_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_marginTop="8dp" />
 
+    <Button
+        android:id="@+id/remove_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remove"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/red"
+        android:textColor="@android:color/white"
+        android:clickable="true"
+        android:enabled="true" />
 </LinearLayout>

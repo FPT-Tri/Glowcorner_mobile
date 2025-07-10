@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -77,7 +76,7 @@ public class ProductDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_product_selection, null);
+        View view = inflater.inflate(R.layout.manager_dialog_product_selection, null);
 
         etSearch = view.findViewById(R.id.et_search);
         RecyclerView rvProducts = view.findViewById(R.id.rv_products);

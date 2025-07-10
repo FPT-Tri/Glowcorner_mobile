@@ -1,7 +1,6 @@
 package com.example.mobile;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -139,7 +138,7 @@ public class HomeActivity extends AppCompatActivity {
     private void searchProduct(String query) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<ProductResponse> call = query.matches("\\d+") ?
-                apiService.getProductById(query) :
+                apiService.getFilterProductById(query) :
                 apiService.getProductsByName(query);
 
         call.enqueue(new Callback<ProductResponse>() {

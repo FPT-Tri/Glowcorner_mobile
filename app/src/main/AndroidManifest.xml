@@ -19,6 +19,7 @@
         <activity android:name=".CartActivity" />
         <activity android:name=".CheckoutActivity" />
         <activity android:name=".HomeActivity" />
+        <activity android:name=".ProductDetailActivity" />
         <activity android:name=".ManagerHomeActivity" />
         <activity android:name=".OrderDetailActivity" />
         <activity android:name=".ProfileActivity" />
@@ -43,6 +44,10 @@
 
 
         <activity android:name=".manager.ManagerRoutinesActivity" />
+        <activity android:name=".manager.ManagerRoutineDetailActivity" />
+<!--        <activity android:name=".manager.CreateRoutineActivity" />-->
+<!--        <activity android:name=".manager.EditRoutineActivity" />-->
+
 
         <activity android:name=".manager.ManagerProductsActivity" />
         <activity android:name=".manager.EditProductActivity" />
@@ -51,6 +56,9 @@
 
 
         <activity android:name=".staff.StaffSkinQuizActivity" />
+        <activity android:name=".staff.EditQuizActivity" />
+        <activity android:name=".staff.CreateQuizActivity" />
+        <activity android:name=".staff.StaffFeedbackActivity" />
 
 
         <activity android:name=".SignInActivity"
